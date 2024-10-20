@@ -5,7 +5,8 @@ import {
   Body,
   Patch,
   Param,
-  Delete, HttpCode,
+  Delete,
+  HttpCode,
 } from '@nestjs/common';
 import { HeroesService } from './heroes.service';
 import { CreateHeroDto } from './dto/create-hero.dto';
