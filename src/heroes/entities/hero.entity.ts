@@ -1,39 +1,104 @@
-import {WithId} from "../../json-database/with-id.interface";
-import {CreateHeroDto} from "../dto/create-hero.dto";
-import {UpdateHeroDto} from "../dto/update-hero.dto";
+import {Column, Entity, PrimaryGeneratedColumn} from 'typeorm';
+import {CreateHeroDto} from '../dto/create-hero.dto';
+import {UpdateHeroDto} from '../dto/update-hero.dto';
+import {Transform} from "class-transformer";
+
 function parseNumber(str) {
     return parseFloat(str.replace(/,/g, ''));
 }
-export class Hero implements WithId {
+
+@Entity()
+export class Hero {
+    @PrimaryGeneratedColumn('uuid')
     id: string;
+
+    @Column()
     name: string;
+
+    @Column()
     race: string;
+
+    @Column()
     gender: string;
+
+    @Column()
     bio: string;
+
+    @Column({
+        unsigned: true,
+    })
     health: number;
+
+    @Column({
+        unsigned: true,
+    })
     attack: number;
+
+    @Column({
+        unsigned: true,
+    })
     defense: number;
+
+    @Column({
+        unsigned: true,
+    })
     kiRestoreSpeed: number;
-    abilities: string[];
+
+    @Column("text")
+    // @Transform(({value}) => typeof value === 'string' ? JSON.parse(value) : value, {toClassOnly: true})
+    // @Transform(({value}) => {
+    //     console.log('toPlainOnly', value)
+    //     return JSON.stringify(value)
+    // }, {toPlainOnly: true})
+    abilities: string
+    @Column()
     img: string;
 
-    static from(dto: CreateHeroDto | UpdateHeroDto, id? :string) {
-        const item = new Hero()
+    static from(createHeroDto: CreateHeroDto): Hero {
+        const hero = new Hero();
+        hero.name = createHeroDto.name;
+        hero.race = createHeroDto.race;
+        hero.gender = createHeroDto.gender;
+        hero.bio = createHeroDto.bio;
+        hero.health = parseNumber(createHeroDto.health); // convert string to number
+        hero.attack = parseNumber(createHeroDto.attack); // convert string to number
+        hero.defense = parseNumber(createHeroDto.defense); // convert string to number
+        hero.kiRestoreSpeed = parseNumber(createHeroDto.kiRestoreSpeed); // convert string to number
+        hero.abilities = JSON.stringify(createHeroDto.abilities);
+        hero.img = createHeroDto.img;
+        return hero;
+    }
 
-        if (id) {
-            item.id = id
+    merge(updateHeroDto: UpdateHeroDto): void {
+        if (updateHeroDto.name !== undefined) {
+            this.name = updateHeroDto.name;
         }
-        if (dto.name !== undefined) item.name = dto.name;
-        if (dto.race !== undefined) item.race = dto.race;
-        if (dto.gender !== undefined) item.gender = dto.gender;
-        if (dto.bio !== undefined) item.bio = dto.bio;
-        if (dto.health !== undefined) item.health = parseNumber(dto.health);
-        if (dto.attack !== undefined) item.attack = parseNumber(dto.attack);
-        if (dto.defense !== undefined) item.defense = parseNumber(dto.defense);
-        if (dto.kiRestoreSpeed !== undefined) item.kiRestoreSpeed = parseNumber(dto.kiRestoreSpeed);
-        if (dto.abilities !== undefined) item.abilities = dto.abilities;
-        if (dto.img !== undefined) item.img = dto.img;
-
-        return item
+        if (updateHeroDto.race !== undefined) {
+            this.race = updateHeroDto.race;
+        }
+        if (updateHeroDto.gender !== undefined) {
+            this.gender = updateHeroDto.gender;
+        }
+        if (updateHeroDto.bio !== undefined) {
+            this.bio = updateHeroDto.bio;
+        }
+        if (updateHeroDto.health !== undefined) {
+            this.health = parseNumber(updateHeroDto.health); // convert string to number
+        }
+        if (updateHeroDto.attack !== undefined) {
+            this.attack = parseNumber(updateHeroDto.attack); // convert string to number
+        }
+        if (updateHeroDto.defense !== undefined) {
+            this.defense = parseNumber(updateHeroDto.defense); // convert string to number
+        }
+        if (updateHeroDto.kiRestoreSpeed !== undefined) {
+            this.kiRestoreSpeed = parseNumber(updateHeroDto.kiRestoreSpeed); // convert string to number
+        }
+        if (updateHeroDto.abilities !== undefined) {
+            this.abilities = JSON.stringify(updateHeroDto.abilities);
+        }
+        if (updateHeroDto.img !== undefined) {
+            this.img = updateHeroDto.img;
+        }
     }
 }

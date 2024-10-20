@@ -1,38 +1,41 @@
-import {Injectable} from '@nestjs/common';
-import {CreateHeroDto} from './dto/create-hero.dto';
-import {UpdateHeroDto} from './dto/update-hero.dto';
-import {Hero} from "./entities/hero.entity";
-import {EntityWriter} from "../json-database/entity-writer/entity-writer";
-import {EntityReader} from "../json-database/entity-reader/entity-reader";
-import {randomUUID} from 'crypto'
+import { Injectable, NotFoundException } from '@nestjs/common';
+import { CreateHeroDto } from './dto/create-hero.dto';
+import { UpdateHeroDto } from './dto/update-hero.dto';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Hero } from './entities/hero.entity';
+import { Repository } from 'typeorm';
 
 @Injectable()
 export class HeroesService {
-    protected readonly
+  constructor(
+    @InjectRepository(Hero)
+    private heroRepository: Repository<Hero>,
+  ) {}
 
-    constructor(protected readonly writer: EntityWriter, protected readonly reader: EntityReader) {
-    }
+  create(createHeroDto: CreateHeroDto) {
+    const entity = Hero.from(createHeroDto);
+    return this.heroRepository.save(entity);
+  }
 
-    create(createHeroDto: CreateHeroDto) {
-        const entity = Hero.from(createHeroDto)
-        entity.id = randomUUID()
-        return this.writer.create(entity)
-    }
+  findAll() {
+    return this.heroRepository.find();
+  }
 
-    findAll() {
-        return `This action returns all heroes`;
-    }
+  findOne(id: string) {
+    return this.heroRepository.findOneBy({ id });
+  }
 
-    findOne(id: string) {
-        return this.reader.get(Hero.from({}, id))
-    }
+  async update(id: string, updateHeroDto: UpdateHeroDto) {
+    const entity = await this.heroRepository.findOneBy({ id });
+    if (entity) {
+      entity.merge(updateHeroDto);
+      return this.heroRepository.save(entity);
+    } else throw new NotFoundException();
+  }
 
-    update(id: string, updateHeroDto: UpdateHeroDto) {
-        const entity = Hero.from(updateHeroDto, id)
-        return this.writer.update(entity)
-    }
-
-    async remove(id: string) {
-        await this.writer.remove(Hero.from({}, id))
-    }
+  async remove(id: string) {
+    const entity = await this.heroRepository.findOneBy({ id });
+    if (!entity) throw new NotFoundException();
+    await this.heroRepository.delete(id);
+  }
 }

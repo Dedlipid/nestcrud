@@ -5,7 +5,7 @@ import {
   Body,
   Patch,
   Param,
-  Delete,
+  Delete, HttpCode,
 } from '@nestjs/common';
 import { HeroesService } from './heroes.service';
 import { CreateHeroDto } from './dto/create-hero.dto';
@@ -16,6 +16,7 @@ export class HeroesController {
   constructor(private readonly heroesService: HeroesService) {}
 
   @Post()
+  @HttpCode(201)
   create(@Body() createHeroDto: CreateHeroDto) {
     return this.heroesService.create(createHeroDto);
   }
@@ -36,6 +37,7 @@ export class HeroesController {
   }
 
   @Delete(':id')
+  @HttpCode(204)
   remove(@Param('id') id: string) {
     return this.heroesService.remove(id);
   }
