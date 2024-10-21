@@ -1,11 +1,8 @@
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
 import { CreateHeroDto } from '../dto/create-hero.dto';
 import { UpdateHeroDto } from '../dto/update-hero.dto';
 import { Transform } from 'class-transformer';
-
-function parseNumber(str) {
-  return parseFloat(str.replace(/,/g, ''));
-}
+import { League } from '../../leagues/entities/league.entity';
 
 @Entity()
 export class Hero {
@@ -27,7 +24,12 @@ export class Hero {
   @Column({
     unsigned: true,
   })
-  health: number;
+  maxHealth: number;
+
+  @Column({
+    unsigned: true,
+  })
+  currentHealth: number;
 
   @Column({
     unsigned: true,
@@ -42,17 +44,16 @@ export class Hero {
   @Column({
     unsigned: true,
   })
-  kiRestoreSpeed: number;
+  healthRestoreRate: number;
 
-  @Column('text')
-  // @Transform(({value}) => typeof value === 'string' ? JSON.parse(value) : value, {toClassOnly: true})
-  // @Transform(({value}) => {
-  //     console.log('toPlainOnly', value)
-  //     return JSON.stringify(value)
-  // }, {toPlainOnly: true})
-  abilities: string;
   @Column()
-  img: string;
+  lastDamageAt!: Date
+
+  @ManyToOne(() => League, (league) => league.heroes, {
+    cascade: false,
+    nullable: true,
+  })
+  league?: League;
 
   static from(createHeroDto: CreateHeroDto): Hero {
     const hero = new Hero();
@@ -60,12 +61,12 @@ export class Hero {
     hero.race = createHeroDto.race;
     hero.gender = createHeroDto.gender;
     hero.bio = createHeroDto.bio;
-    hero.health = parseNumber(createHeroDto.health); // convert string to number
-    hero.attack = parseNumber(createHeroDto.attack); // convert string to number
-    hero.defense = parseNumber(createHeroDto.defense); // convert string to number
-    hero.kiRestoreSpeed = parseNumber(createHeroDto.kiRestoreSpeed); // convert string to number
-    hero.abilities = JSON.stringify(createHeroDto.abilities);
-    hero.img = createHeroDto.img;
+    hero.maxHealth = createHeroDto.maxHealth;
+    hero.currentHealth = createHeroDto.currentHealth;
+    hero.attack = createHeroDto.attack;
+    hero.defense = createHeroDto.defense;
+    hero.healthRestoreRate = createHeroDto.healthRestoreRate;
+    hero.lastDamageAt = new Date(createHeroDto.lastDamageAt);
     return hero;
   }
 
@@ -82,23 +83,23 @@ export class Hero {
     if (updateHeroDto.bio !== undefined) {
       this.bio = updateHeroDto.bio;
     }
-    if (updateHeroDto.health !== undefined) {
-      this.health = parseNumber(updateHeroDto.health); // convert string to number
+    if (updateHeroDto.maxHealth !== undefined) {
+      this.maxHealth = updateHeroDto.maxHealth;
+    }
+    if (updateHeroDto.currentHealth !== undefined) {
+      this.currentHealth = updateHeroDto.currentHealth;
     }
     if (updateHeroDto.attack !== undefined) {
-      this.attack = parseNumber(updateHeroDto.attack); // convert string to number
+      this.attack = updateHeroDto.attack;
     }
     if (updateHeroDto.defense !== undefined) {
-      this.defense = parseNumber(updateHeroDto.defense); // convert string to number
+      this.defense = updateHeroDto.defense;
     }
-    if (updateHeroDto.kiRestoreSpeed !== undefined) {
-      this.kiRestoreSpeed = parseNumber(updateHeroDto.kiRestoreSpeed); // convert string to number
+    if (updateHeroDto.healthRestoreRate !== undefined) {
+      this.healthRestoreRate = updateHeroDto.healthRestoreRate;
     }
-    if (updateHeroDto.abilities !== undefined) {
-      this.abilities = JSON.stringify(updateHeroDto.abilities);
-    }
-    if (updateHeroDto.img !== undefined) {
-      this.img = updateHeroDto.img;
+    if (updateHeroDto.lastDamageAt !== undefined) {
+      this.lastDamageAt = new Date(updateHeroDto.lastDamageAt);
     }
   }
 }

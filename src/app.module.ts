@@ -4,6 +4,8 @@ import { AppService } from './app.service';
 import { HeroesModule } from './heroes/heroes.module';
 import { ConfigModule } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { LeaguesModule } from './leagues/leagues.module';
+import { WarsModule } from './wars/wars.module';
 
 @Module({
   imports: [
@@ -15,6 +17,8 @@ import { TypeOrmModule } from '@nestjs/typeorm';
       autoLoadEntities: true,
     }),
     HeroesModule,
+    LeaguesModule,
+    WarsModule,
   ],
   controllers: [AppController],
   providers: [AppService],

@@ -24,7 +24,7 @@ export class HeroesController {
 
   @Get()
   findAll() {
-    return this.heroesService.findAll();
+    return this.heroesService.findAll(); // todo add pagination
   }
 
   @Get(':id')
