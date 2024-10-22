@@ -16,13 +16,12 @@ export class LeaguesHeroesService {
     @InjectRepository(League)
     private leagueRepository: Repository<League>,
     private heroService: HeroesService,
-  ) {}
+  ) { }
 
   async createAnonymousLeague(hero: Hero) {
     const anonymousLeague = new League();
 
-    const queryRunner =
-      this.leagueRepository.manager.connection.createQueryRunner();
+    const queryRunner = this.leagueRepository.manager.connection.createQueryRunner();
 
     await queryRunner.connect();
     await queryRunner.startTransaction();
@@ -39,6 +38,8 @@ export class LeaguesHeroesService {
     }
   }
 
+
+
   async insert(leagueId: string, heroId: string) {
     const hero = await this.heroService.findOne(heroId);
     const league = await this.leagueRepository.findOneBy({ id: leagueId });
@@ -48,17 +49,22 @@ export class LeaguesHeroesService {
         throw new ConflictException();
       }
       hero.league = league;
-      return this.leagueRepository.manager.transaction(
-        // todo refactor this with queryRunner
-        async (transactionalEntityManager) => {
-          const result = await transactionalEntityManager.save(hero);
-          if (heroOldLeague) {
-            await transactionalEntityManager.delete(League, heroOldLeague.id);
-          }
-          return result;
-        },
-      );
-    } else throw new NotFoundException();
+
+      const queryRunner = this.leagueRepository.manager.connection.createQueryRunner();
+      await queryRunner.connect();
+      await queryRunner.startTransaction();
+      try {
+        await queryRunner.manager.save(hero);
+        if (heroOldLeague)
+          await queryRunner.manager.delete(League, heroOldLeague.id);
+
+        await queryRunner.commitTransaction();
+      } catch (error) {
+        await queryRunner.rollbackTransaction();
+      } finally {
+        await queryRunner.release();
+      }
+    }
   }
 
   async kick(leagueId: string, heroId: string) {

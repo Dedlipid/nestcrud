@@ -10,15 +10,15 @@ export class HeroesService {
   constructor(
     @InjectRepository(Hero)
     private heroRepository: Repository<Hero>,
-  ) {}
+  ) { }
 
   create(createHeroDto: CreateHeroDto) {
     const entity = Hero.from(createHeroDto);
     return this.heroRepository.save(entity);
   }
 
-  findAll() {
-    return this.heroRepository.find();
+  findAll({ take = 10, skip = 0 }: { take?: number; skip: number }) {
+    return this.heroRepository.findAndCount({ take: take, skip: skip });
   }
 
   findOne(id: string) {

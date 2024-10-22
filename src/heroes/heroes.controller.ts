@@ -7,6 +7,7 @@ import {
   Param,
   Delete,
   HttpCode,
+  Query
 } from '@nestjs/common';
 import { HeroesService } from './heroes.service';
 import { CreateHeroDto } from './dto/create-hero.dto';
@@ -14,7 +15,7 @@ import { UpdateHeroDto } from './dto/update-hero.dto';
 
 @Controller('heroes')
 export class HeroesController {
-  constructor(private readonly heroesService: HeroesService) {}
+  constructor(private readonly heroesService: HeroesService) { }
 
   @Post()
   @HttpCode(201)
@@ -23,8 +24,12 @@ export class HeroesController {
   }
 
   @Get()
-  findAll() {
-    return this.heroesService.findAll(); // todo add pagination
+  findAll(@Query('limit') take?: number, @Query('skip') skip?: number) {
+    // Set default values if parameters are undefined
+    const limit = take ?? 10; // Default limit to 10 if not provided
+    const offset = skip ?? 0; // Default offset to 0 if not provided
+
+    return this.heroesService.findAll({ skip: offset, take: limit });
   }
 
   @Get(':id')
