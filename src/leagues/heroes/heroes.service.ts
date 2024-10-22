@@ -20,12 +20,23 @@ export class LeaguesHeroesService {
 
   async createAnonymousLeague(hero: Hero) {
     const anonymousLeague = new League();
-    return this.leagueRepository.manager.transaction( // todo refactor this with createQueryRunner
-      async (transactionalEntityManager) => {
-        hero.league = await transactionalEntityManager.save(anonymousLeague);
-        return await transactionalEntityManager.save(hero);
-      },
-    );
+
+    const queryRunner =
+      this.leagueRepository.manager.connection.createQueryRunner();
+
+    await queryRunner.connect();
+    await queryRunner.startTransaction();
+
+    try {
+      await queryRunner.manager.save(anonymousLeague);
+      await queryRunner.manager.save(hero);
+
+      await queryRunner.commitTransaction();
+    } catch (error) {
+      await queryRunner.rollbackTransaction();
+    } finally {
+      await queryRunner.release();
+    }
   }
 
   async insert(leagueId: string, heroId: string) {
@@ -37,7 +48,8 @@ export class LeaguesHeroesService {
         throw new ConflictException();
       }
       hero.league = league;
-      return this.leagueRepository.manager.transaction( // todo refactor this with createQueryRunner
+      return this.leagueRepository.manager.transaction(
+        // todo refactor this with queryRunner
         async (transactionalEntityManager) => {
           const result = await transactionalEntityManager.save(hero);
           if (heroOldLeague) {

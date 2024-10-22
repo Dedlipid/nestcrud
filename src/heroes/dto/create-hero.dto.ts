@@ -1,21 +1,21 @@
 export class CreateHeroDto {
-    name: string;
+  name: string;
 
-    race: string;
+  race: string;
 
-    gender: string;
+  gender: string;
 
-    bio: string;
+  bio: string;
 
-    maxHealth: number;
+  maxHealth: number;
 
-    currentHealth: number;
+  currentHealth: number;
 
-    attack: number;
+  attack: number;
 
-    defense: number;
+  defense: number;
 
-    healthRestoreRate: number;
+  healthRestoreRate: number;
 
-    lastDamageAt!: string
+  lastDamageAt!: string;
 }
