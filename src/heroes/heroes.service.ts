@@ -18,7 +18,7 @@ export class HeroesService {
   }
 
   findAll({ take = 10, skip = 0 }: { take?: number; skip: number }) {
-    return this.heroRepository.findAndCount({ take: take, skip: skip });
+    return this.heroRepository.find({ take: take, skip: skip });
   }
 
   findOne(id: string) {
