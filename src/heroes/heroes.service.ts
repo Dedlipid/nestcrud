@@ -10,7 +10,7 @@ export class HeroesService {
   constructor(
     @InjectRepository(Hero)
     private heroRepository: Repository<Hero>,
-  ) { }
+  ) {}
 
   create(createHeroDto: CreateHeroDto) {
     const entity = Hero.from(createHeroDto);

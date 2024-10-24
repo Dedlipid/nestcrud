@@ -16,12 +16,13 @@ export class LeaguesHeroesService {
     @InjectRepository(League)
     private leagueRepository: Repository<League>,
     private heroService: HeroesService,
-  ) { }
+  ) {}
 
   async createAnonymousLeague(hero: Hero) {
     const anonymousLeague = new League();
 
-    const queryRunner = this.leagueRepository.manager.connection.createQueryRunner();
+    const queryRunner =
+      this.leagueRepository.manager.connection.createQueryRunner();
 
     await queryRunner.connect();
     await queryRunner.startTransaction();
@@ -38,8 +39,6 @@ export class LeaguesHeroesService {
     }
   }
 
-
-
   async insert(leagueId: string, heroId: string) {
     const hero = await this.heroService.findOne(heroId);
     const league = await this.leagueRepository.findOneBy({ id: leagueId });
@@ -50,7 +49,8 @@ export class LeaguesHeroesService {
       }
       hero.league = league;
 
-      const queryRunner = this.leagueRepository.manager.connection.createQueryRunner();
+      const queryRunner =
+        this.leagueRepository.manager.connection.createQueryRunner();
       await queryRunner.connect();
       await queryRunner.startTransaction();
       try {

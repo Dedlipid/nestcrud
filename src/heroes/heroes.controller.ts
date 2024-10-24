@@ -7,7 +7,7 @@ import {
   Param,
   Delete,
   HttpCode,
-  Query
+  Query,
 } from '@nestjs/common';
 import { HeroesService } from './heroes.service';
 import { CreateHeroDto } from './dto/create-hero.dto';
@@ -15,7 +15,7 @@ import { UpdateHeroDto } from './dto/update-hero.dto';
 
 @Controller('heroes')
 export class HeroesController {
-  constructor(private readonly heroesService: HeroesService) { }
+  constructor(private readonly heroesService: HeroesService) {}
 
   @Post()
   @HttpCode(201)
