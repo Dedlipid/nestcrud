@@ -8,6 +8,8 @@ export class War {
     @PrimaryGeneratedColumn('uuid')
     id: string;
 
+    @Column()
+    name: string;
 
     @Column()
     startAt: Date;

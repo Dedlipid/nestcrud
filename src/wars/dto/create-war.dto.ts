@@ -1,1 +1,5 @@
-export class CreateWarDto {}
+export class CreateWarDto {
+    name: string;
+
+    startAt: Date;
+}

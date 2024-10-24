@@ -21,22 +21,22 @@ export class WarsController {
   }
 
   @Get()
-  findAll() {
+  findAll() { // todo add pagination
     return this.warsService.findAll();
   }
 
   @Get(':id')
   findOne(@Param('id') id: string) {
-    return this.warsService.findOne(+id);
+    return this.warsService.findOne(id);
   }
 
   @Patch(':id')
   update(@Param('id') id: string, @Body() updateWarDto: UpdateWarDto) {
-    return this.warsService.update(+id, updateWarDto);
+    return this.warsService.update(id, updateWarDto);
   }
 
   @Delete(':id')
   remove(@Param('id') id: string) {
-    return this.warsService.remove(+id);
+    return this.warsService.remove(id);
   }
 }
