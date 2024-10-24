@@ -3,6 +3,18 @@
   "collection": "@nestjs/schematics",
   "sourceRoot": "src",
   "compilerOptions": {
-    "deleteOutDir": true
+    "deleteOutDir": true,
+    "webpack": true
+  },
+  "projects": {
+    "war-simulator": {
+      "type": "library",
+      "root": "libs/war-simulator",
+      "entryFile": "index",
+      "sourceRoot": "libs/war-simulator/src",
+      "compilerOptions": {
+        "tsConfigPath": "libs/war-simulator/tsconfig.lib.json"
+      }
+    }
   }
 }
