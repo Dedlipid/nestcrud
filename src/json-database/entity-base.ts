@@ -61,10 +61,7 @@ export class EntityBase {
     } else throw new NotFoundException();
   }
 
-  protected async write<T extends WithId>(
-    fileAddress: string,
-    content: string,
-  ) {
+  protected async write(fileAddress: string, content: string) {
     await fs.writeFile(fileAddress, content);
   }
 

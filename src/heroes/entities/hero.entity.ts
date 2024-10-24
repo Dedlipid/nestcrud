@@ -1,7 +1,6 @@
 import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
 import { CreateHeroDto } from '../dto/create-hero.dto';
 import { UpdateHeroDto } from '../dto/update-hero.dto';
-import { Transform } from 'class-transformer';
 import { League } from '../../leagues/entities/league.entity';
 
 @Entity()
