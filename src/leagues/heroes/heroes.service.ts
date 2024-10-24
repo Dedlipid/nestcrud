@@ -32,7 +32,7 @@ export class LeaguesHeroesService {
       await queryRunner.manager.save(hero);
 
       await queryRunner.commitTransaction();
-    } catch (error) {
+    } catch {
       await queryRunner.rollbackTransaction();
     } finally {
       await queryRunner.release();
@@ -59,7 +59,7 @@ export class LeaguesHeroesService {
           await queryRunner.manager.delete(League, heroOldLeague.id);
 
         await queryRunner.commitTransaction();
-      } catch (error) {
+      } catch {
         await queryRunner.rollbackTransaction();
       } finally {
         await queryRunner.release();
