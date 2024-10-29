@@ -1,34 +1,41 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreateWarDto } from './dto/create-war.dto';
 import { UpdateWarDto } from './dto/update-war.dto';
-import {InjectRepository} from "@nestjs/typeorm";
-import {Repository} from "typeorm";
-import {War} from "./entities/war.entity";
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+import { War } from './entities/war.entity';
 
 // todo implement this service
 @Injectable()
 export class WarsService {
   constructor(
-      @InjectRepository(War)
-      private warRepository: Repository<War>,
+    @InjectRepository(War)
+    private warRepository: Repository<War>,
   ) {}
   create(createWarDto: CreateWarDto) {
-    return 'This action adds a new war';
+    const entity = War.from(createWarDto);
+    return this.warRepository.save(entity);
   }
 
-  findAll() {
-    return `This action returns all wars`;
+  findAll({ take = 10, skip = 0 }: { take?: number; skip: number }) {
+    return this.warRepository.findAndCount({ take: take, skip: skip });
   }
 
   findOne(id: string) {
-    return `This action returns a #${id} war`;
+    return this.warRepository.findOneBy({ id });
   }
 
-  update(id: string, updateWarDto: UpdateWarDto) {
-    return `This action updates a #${id} war`;
+  async update(id: string, updateWarDto: UpdateWarDto) {
+    const entity = await this.warRepository.findOneBy({ id });
+    if (entity) {
+      entity.merge(updateWarDto);
+      return this.warRepository.save(entity);
+    } else throw new NotFoundException();
   }
 
-  remove(id: string) {
-    return `This action removes a #${id} war`;
+  async remove(id: string) {
+    const entity = await this.warRepository.findOneBy({ id });
+    if (!entity) throw new NotFoundException();
+    await this.warRepository.delete(id);
   }
 }
