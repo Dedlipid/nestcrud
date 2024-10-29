@@ -16,12 +16,13 @@ export class LeaguesHeroesService {
     @InjectRepository(League)
     private leagueRepository: Repository<League>,
     private heroService: HeroesService,
-  ) { }
+  ) {}
 
   async createAnonymousLeague(hero: Hero) {
     const anonymousLeague = new League();
 
-    const queryRunner = this.leagueRepository.manager.connection.createQueryRunner();
+    const queryRunner =
+      this.leagueRepository.manager.connection.createQueryRunner();
 
     await queryRunner.connect();
     await queryRunner.startTransaction();
@@ -31,14 +32,13 @@ export class LeaguesHeroesService {
       await queryRunner.manager.save(hero);
 
       await queryRunner.commitTransaction();
-    } catch (error) {
+    } catch (err) {
       await queryRunner.rollbackTransaction();
+      throw err;
     } finally {
       await queryRunner.release();
     }
   }
-
-
 
   async insert(leagueId: string, heroId: string) {
     const hero = await this.heroService.findOne(heroId);
@@ -50,7 +50,8 @@ export class LeaguesHeroesService {
       }
       hero.league = league;
 
-      const queryRunner = this.leagueRepository.manager.connection.createQueryRunner();
+      const queryRunner =
+        this.leagueRepository.manager.connection.createQueryRunner();
       await queryRunner.connect();
       await queryRunner.startTransaction();
       try {
@@ -59,8 +60,9 @@ export class LeaguesHeroesService {
           await queryRunner.manager.delete(League, heroOldLeague.id);
 
         await queryRunner.commitTransaction();
-      } catch (error) {
+      } catch (err) {
         await queryRunner.rollbackTransaction();
+        throw err;
       } finally {
         await queryRunner.release();
       }
