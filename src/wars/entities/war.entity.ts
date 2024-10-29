@@ -1,39 +1,60 @@
-import {Column, Entity, ManyToOne, OneToMany, PrimaryGeneratedColumn} from "typeorm";
-import {Participant} from "./participant.entity";
-import {League} from "../../leagues/entities/league.entity";
-import {Expose} from "class-transformer";
+import {
+  Column,
+  Entity,
+  ManyToOne,
+  OneToMany,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
+import { Participant } from './participant.entity';
+import { League } from '../../leagues/entities/league.entity';
+import { Expose } from 'class-transformer';
+import { CreateWarDto } from '../dto/create-war.dto';
 
 @Entity()
 export class War {
-    @PrimaryGeneratedColumn('uuid')
-    id: string;
+  @PrimaryGeneratedColumn('uuid')
+  id: string;
 
-    @Column()
-    name: string;
+  @Column()
+  name: string;
 
-    @Column()
-    startAt: Date;
+  @Column()
+  startAt: Date;
 
-    @Column()
-    endAt?: Date
+  @Column()
+  endAt?: Date;
 
-    @OneToMany(() => Participant, (participant) => participant.war, { cascade: true })
-    participants: Participant[];
+  @OneToMany(() => Participant, (participant) => participant.war, {
+    cascade: true,
+  })
+  participants: Participant[];
 
-    @ManyToOne(() => League, {
-        cascade: false,
-        nullable: true
-    })
-    winner?: League;
+  @ManyToOne(() => League, {
+    cascade: false,
+    nullable: true,
+  })
+  winner?: League;
 
-    @ManyToOne(() => League, {
-        cascade: false,
-        nullable: true
-    })
-    burnt?: League;
+  @ManyToOne(() => League, {
+    cascade: false,
+    nullable: true,
+  })
+  burnt?: League;
 
-    @Expose()
-    get withdraw() {
-        return !!this.endAt && !this.burnt && !this.winner
-    }
+  @Expose()
+  get withdraw() {
+    return !!this.endAt && !this.burnt && !this.winner;
+  }
+
+  static from(createWarDto: CreateWarDto): War {
+    const war = new War();
+    war.name = createWarDto.name;
+    war.startAt = createWarDto.startAt;
+    return war;
+  }
+
+  merge(updateWarDto: Partial<CreateWarDto>) {
+    this.name = updateWarDto.name ?? this.name;
+    this.startAt = updateWarDto.startAt ?? this.startAt;
+  }
 }
