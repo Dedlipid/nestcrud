@@ -10,6 +10,7 @@ export class ParticipantService {
   constructor(
     private readonly heroesService: HeroesService,
     private readonly warsService: WarsService,
+    @InjectRepository(Participant)
     private participantRepository: Repository<Participant>,
   ) {}
 
