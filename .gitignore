@@ -58,7 +58,7 @@ pids
 report.[0-9]*.[0-9]*.[0-9]*.[0-9]*.json
 
 # MySQL database file
-*.sql
+*.sqlite
 
 # Abandoned Modules
 json-database/
