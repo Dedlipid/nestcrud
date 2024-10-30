@@ -45,16 +45,4 @@ export class War {
   get withdraw() {
     return !!this.endAt && !this.burnt && !this.winner;
   }
-
-  static from(createWarDto: CreateWarDto): War {
-    const war = new War();
-    war.name = createWarDto.name;
-    war.startAt = createWarDto.startAt;
-    return war;
-  }
-
-  merge(updateWarDto: Partial<CreateWarDto>) {
-    this.name = updateWarDto.name ?? this.name;
-    this.startAt = updateWarDto.startAt ?? this.startAt;
-  }
 }
