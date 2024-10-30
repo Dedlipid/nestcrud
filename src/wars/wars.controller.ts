@@ -6,6 +6,8 @@ import {
   Patch,
   Param,
   Delete,
+  HttpCode,
+  Query,
 } from '@nestjs/common';
 import { WarsService } from './wars.service';
 import { CreateWarDto } from './dto/create-war.dto';
@@ -16,13 +18,20 @@ export class WarsController {
   constructor(private readonly warsService: WarsService) {}
 
   @Post()
+  @HttpCode(201)
   create(@Body() createWarDto: CreateWarDto) {
     return this.warsService.create(createWarDto);
   }
 
   @Get()
-  findAll() { // todo add pagination
-    return this.warsService.findAll();
+  findAll(@Query('limit') take?: number, @Query('skip') skip?: number) {
+    const limit = take > 100 ? 100 : (take ?? 10);
+    const offset = skip > 1000 ? 1000 : (skip ?? 0);
+
+    return this.warsService.findAll({
+      skip: offset,
+      take: limit,
+    });
   }
 
   @Get(':id')
@@ -36,6 +45,7 @@ export class WarsController {
   }
 
   @Delete(':id')
+  @HttpCode(204)
   remove(@Param('id') id: string) {
     return this.warsService.remove(id);
   }

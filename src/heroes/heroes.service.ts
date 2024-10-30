@@ -20,7 +20,6 @@ export class HeroesService {
   findAll({ take = 10, skip = 0 }: { take?: number; skip?: number }) {
     const limit = take > 100 ? 100 : (take ?? 10);
     const offset = skip > 1000 ? 1000 : (skip ?? 0);
-
     return this.heroRepository.findAndCount({ take: limit, skip: offset });
   }
 
