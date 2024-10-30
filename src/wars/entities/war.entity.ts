@@ -8,7 +8,6 @@ import {
 import { Participant } from './participant.entity';
 import { League } from '../../leagues/entities/league.entity';
 import { Expose } from 'class-transformer';
-import { CreateWarDto } from '../dto/create-war.dto';
 
 @Entity()
 export class War {
@@ -21,7 +20,7 @@ export class War {
   @Column()
   startAt: Date;
 
-  @Column()
+  @Column({ nullable: true })
   endAt?: Date;
 
   @OneToMany(() => Participant, (participant) => participant.war, {
