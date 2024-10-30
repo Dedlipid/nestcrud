@@ -4,6 +4,7 @@ import { HeroesService } from 'src/heroes/heroes.service';
 import { WarsService } from '../wars.service';
 import { UUID } from 'crypto';
 import { Repository } from 'typeorm';
+import { InjectRepository } from '@nestjs/typeorm';
 
 @Injectable()
 export class ParticipantService {
