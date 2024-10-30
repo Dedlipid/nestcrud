@@ -8,22 +8,13 @@ import { War } from './entities/war.entity';
 import { ParticipantController } from './participant/participant.controller';
 import { ParticipantService } from './participant/participant.service';
 import { HeroesModule } from 'src/heroes/heroes.module';
-import { League } from 'src/leagues/entities/league.entity';
-import { APP_PIPE } from '@nestjs/core';
 
 @Module({
   controllers: [WarsController, ParticipantController],
-  providers: [
-    WarsService,
-    ParticipantService,
-    {
-      provide: APP_PIPE,
-      useClass: ValidationPipe,
-    },
-  ],
+  providers: [WarsService, ParticipantService],
   imports: [
     FightsModule,
-    TypeOrmModule.forFeature([War, Participant, League]),
+    TypeOrmModule.forFeature([War, Participant]),
     HeroesModule,
   ],
 })
