@@ -12,6 +12,8 @@ import {
 import { HeroesService } from './heroes.service';
 import { CreateHeroDto } from './dto/create-hero.dto';
 import { UpdateHeroDto } from './dto/update-hero.dto';
+import { assert } from 'console';
+import { sk } from '@faker-js/faker/.';
 
 @Controller('heroes')
 export class HeroesController {
@@ -25,10 +27,7 @@ export class HeroesController {
 
   @Get()
   findAll(@Query('limit') take?: number, @Query('skip') skip?: number) {
-    const limit = take > 100 ? 100 : (take ?? 10);
-    const offset = skip > 100 ? 100 : (skip ?? 0);
-
-    return this.heroesService.findAll({ skip: offset, take: limit });
+    return this.heroesService.findAll({ skip: skip, take: take });
   }
 
   @Get(':id')
