@@ -1,5 +1,9 @@
-export class CreateWarDto {
-    name: string;
+import { IsString, IsDateString } from 'class-validator';
 
-    startAt: Date;
+export class CreateWarDto {
+  @IsString()
+  name: string;
+
+  @IsDateString()
+  startAt: Date;
 }
