@@ -1,17 +1,18 @@
-import {Controller, Delete, Param, Post} from '@nestjs/common';
-import {ParticipantService} from "./participant.service";
+import { Controller, Delete, Get, Param, Post, Query } from '@nestjs/common';
+import { ParticipantService } from './participant.service';
+import { UUID } from 'crypto';
 
-// todo implement this
-@Controller('participant')
+@Controller('wars/:warId/participant')
 export class ParticipantController {
-    constructor(protected readonly participantService: ParticipantService) {
-    }
+  constructor(protected readonly participantService: ParticipantService) {}
 
-    @Post('/:heroId')
-    add(@Param('heroId') heroId: string) {
-    }
+  @Post('/:heroId')
+  create(@Param('warId') warId: UUID, @Param('heroId') heroId: UUID) {
+    return this.participantService.create(warId, heroId);
+  }
 
-    @Delete('/:heroId')
-    remove(@Param('heroId') heroId: string) {
-    }
+  @Delete('/:heroId')
+  remove(@Param('warID') warId: UUID, @Param('heroId') heroId: UUID) {
+    return this.participantService.remove(warId, heroId);
+  }
 }

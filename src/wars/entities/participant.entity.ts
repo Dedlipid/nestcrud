@@ -1,25 +1,40 @@
-import {Entity, ManyToOne, PrimaryGeneratedColumn} from "typeorm";
-import {War} from "./war.entity";
-import {League} from "../../leagues/entities/league.entity";
-import {Hero} from "../../heroes/entities/hero.entity";
+import {
+  Entity,
+  JoinColumn,
+  ManyToOne,
+  PrimaryColumn,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
+import { War } from './war.entity';
+import { League } from '../../leagues/entities/league.entity';
+import { Hero } from '../../heroes/entities/hero.entity';
+import { UUID } from 'crypto';
 
 @Entity()
 export class Participant {
-    @PrimaryGeneratedColumn('uuid')
-    id: string;
+  @PrimaryGeneratedColumn('uuid')
+  id: UUID;
 
-    @ManyToOne(() => War, (war) => war.participants, {
-        cascade: false,
-    })
-    war: War;
+  @PrimaryColumn('uuid')
+  warId: UUID;
 
-    @ManyToOne(() => League, {
-        cascade: false,
-    })
-    league: League;
+  @PrimaryColumn('uuid')
+  heroId: UUID;
 
-    @ManyToOne(() => Hero, {
-        cascade: false,
-    })
-    hero: Hero;
+  @ManyToOne(() => War, (war) => war.participants, {
+    cascade: false,
+  })
+  @JoinColumn({ name: 'warId' })
+  war: War;
+
+  @ManyToOne(() => Hero, {
+    cascade: false,
+  })
+  @JoinColumn({ name: 'heroId' })
+  hero: Hero;
+
+  @ManyToOne(() => League, {
+    cascade: false,
+  })
+  league: League;
 }
