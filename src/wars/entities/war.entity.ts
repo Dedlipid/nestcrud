@@ -8,12 +8,12 @@ import {
 import { Participant } from './participant.entity';
 import { League } from '../../leagues/entities/league.entity';
 import { Expose } from 'class-transformer';
-import { CreateWarDto } from '../dto/create-war.dto';
+import { UUID } from 'crypto';
 
 @Entity()
 export class War {
   @PrimaryGeneratedColumn('uuid')
-  id: string;
+  id: UUID;
 
   @Column()
   name: string;
@@ -21,7 +21,7 @@ export class War {
   @Column()
   startAt: Date;
 
-  @Column()
+  @Column({ nullable: true })
   endAt?: Date;
 
   @OneToMany(() => Participant, (participant) => participant.war, {
@@ -44,17 +44,5 @@ export class War {
   @Expose()
   get withdraw() {
     return !!this.endAt && !this.burnt && !this.winner;
-  }
-
-  static from(createWarDto: CreateWarDto): War {
-    const war = new War();
-    war.name = createWarDto.name;
-    war.startAt = createWarDto.startAt;
-    return war;
-  }
-
-  merge(updateWarDto: Partial<CreateWarDto>) {
-    this.name = updateWarDto.name ?? this.name;
-    this.startAt = updateWarDto.startAt ?? this.startAt;
   }
 }

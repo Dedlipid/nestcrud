@@ -12,6 +12,7 @@ import {
 import { WarsService } from './wars.service';
 import { CreateWarDto } from './dto/create-war.dto';
 import { UpdateWarDto } from './dto/update-war.dto';
+import { UUID } from 'crypto';
 
 @Controller('wars')
 export class WarsController {
@@ -25,28 +26,25 @@ export class WarsController {
 
   @Get()
   findAll(@Query('limit') take?: number, @Query('skip') skip?: number) {
-    const limit = take > 100 ? 100 : (take ?? 10);
-    const offset = skip > 1000 ? 1000 : (skip ?? 0);
-
     return this.warsService.findAll({
-      skip: offset,
-      take: limit,
+      skip: skip,
+      take: take,
     });
   }
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
+  @Get('/:id')
+  findOne(@Param('id') id: UUID) {
     return this.warsService.findOne(id);
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateWarDto: UpdateWarDto) {
+  update(@Param('id') id: UUID, @Body() updateWarDto: UpdateWarDto) {
     return this.warsService.update(id, updateWarDto);
   }
 
   @Delete(':id')
   @HttpCode(204)
-  remove(@Param('id') id: string) {
+  remove(@Param('id') id: UUID) {
     return this.warsService.remove(id);
   }
 }
