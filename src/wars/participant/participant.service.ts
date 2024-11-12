@@ -1,11 +1,14 @@
-import { Injectable } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  UnprocessableEntityException,
+} from '@nestjs/common';
 import { Participant } from '../entities/participant.entity';
 import { HeroesService } from 'src/heroes/heroes.service';
 import { WarsService } from '../wars.service';
 import { UUID } from 'crypto';
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
-
 
 @Injectable()
 export class ParticipantService {
@@ -17,31 +20,44 @@ export class ParticipantService {
   ) {}
 
   async create(warId: UUID, heroId: UUID) {
-    const participant = new Participant();
     const hero = await this.heroesService.findOne(heroId);
-    if (!hero) throw new Error('Hero not found');
-    if (!hero.league) throw new Error('Hero must be in a league');
-    else {
-      participant.heroId = heroId;
-      participant.hero = hero;
-      participant.league = hero.league;
-    }
+    if (!hero) throw new NotFoundException('Hero not found');
+    if (!hero.league)
+      throw new UnprocessableEntityException('Hero must be in a league');
     const war = await this.warsService.findOne(warId);
-    if (!war) throw new Error('War not found');
-    participant.war = war;
-    participant.warId = warId;
-    return await this.participantRepository.save(participant);
+    if (!war) throw new NotFoundException('War not found');
+
+    const participant = this.participantRepository.create({
+      war,
+      warId,
+      hero,
+      heroId,
+      league: hero.league,
+    });
+
+    return this.participantRepository.save(participant);
   }
 
-  findOne(id: UUID) {
-    return this.participantRepository.findOneBy({ id });
+  async findOne(id: UUID) {
+    const participant = await this.participantRepository.findOneBy({ id });
+    if (!participant) {
+      throw new NotFoundException('Participant not found');
+    }
+    return participant;
   }
 
   async remove(warId: UUID, heroId: UUID) {
+    const war = await this.warsService.findOne(warId);
+    if (!war) throw new NotFoundException('War not found');
+    if (war.withdraw) throw new UnprocessableEntityException('War is ongoing');
     const participant = await this.participantRepository.findOneBy({
       heroId,
       warId,
     });
-    return this.participantRepository.remove(participant);
+    if (!participant) {
+      throw new NotFoundException('Participant not found');
+    }
+
+    await this.participantRepository.remove(participant);
   }
 }
