@@ -8,6 +8,9 @@ import {
   Delete,
   HttpCode,
   Query,
+  ParseUUIDPipe,
+  UsePipes,
+  ValidationPipe,
 } from '@nestjs/common';
 import { WarsService } from './wars.service';
 import { CreateWarDto } from './dto/create-war.dto';
@@ -19,32 +22,36 @@ export class WarsController {
   constructor(private readonly warsService: WarsService) {}
 
   @Post()
+  @UsePipes(new ValidationPipe({ transform: true }))
   @HttpCode(201)
   create(@Body() createWarDto: CreateWarDto) {
     return this.warsService.create(createWarDto);
   }
 
   @Get()
-  findAll(@Query('limit') take?: number, @Query('skip') skip?: number) {
+  findAll(@Query('limit') take?: string, @Query('skip') skip?: string) {
     return this.warsService.findAll({
-      skip: skip,
-      take: take,
+      skip: parseInt(skip) || 0,
+      take: Math.min(parseInt(take) || 10, 100),
     });
   }
 
-  @Get('/:id')
-  findOne(@Param('id') id: UUID) {
+  @Get(':id')
+  findOne(@Param('id', ParseUUIDPipe) id: UUID) {
     return this.warsService.findOne(id);
   }
 
   @Patch(':id')
-  update(@Param('id') id: UUID, @Body() updateWarDto: UpdateWarDto) {
+  update(
+    @Param('id', ParseUUIDPipe) id: UUID,
+    @Body() updateWarDto: UpdateWarDto,
+  ) {
     return this.warsService.update(id, updateWarDto);
   }
 
   @Delete(':id')
   @HttpCode(204)
-  remove(@Param('id') id: UUID) {
+  remove(@Param('id', ParseUUIDPipe) id: UUID) {
     return this.warsService.remove(id);
   }
 }
