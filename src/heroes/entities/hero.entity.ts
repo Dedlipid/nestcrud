@@ -51,4 +51,9 @@ export class Hero {
     nullable: true,
   })
   league?: League;
+
+  @Column({
+    default: 'CURRENT_TIMESTAMP'
+  })
+  createdAt: Date
 }

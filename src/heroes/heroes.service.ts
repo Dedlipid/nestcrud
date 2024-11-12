@@ -5,6 +5,8 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Hero } from './entities/hero.entity';
 import { Repository } from 'typeorm';
 import { UUID } from 'crypto';
+import {createFindOptions} from "../helpers/pagination/database";
+import {PaginationOptions} from "../helpers/pagination/interface";
 
 @Injectable()
 export class HeroesService {
@@ -22,11 +24,11 @@ export class HeroesService {
     return this.heroRepository.save(hero);
   }
 
-  findAll({ take, skip }: { take?: number; skip?: number }) {
-    return this.heroRepository.findAndCount({ take: take, skip: skip });
+  findAll(options: PaginationOptions = {}) {
+    return this.heroRepository.find(createFindOptions(options));
   }
 
-  async cfindOne(id: UUID) {
+  async findOne(id: UUID) {
     const hero = await this.heroRepository.findOneBy({ id });
     if (!hero) throw new NotFoundException(`Hero with ID ${id} not found`);
     return hero;
