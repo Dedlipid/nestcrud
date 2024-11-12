@@ -4,6 +4,7 @@ import { UpdateHeroDto } from './dto/update-hero.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Hero } from './entities/hero.entity';
 import { Repository } from 'typeorm';
+import { UUID } from 'crypto';
 
 @Injectable()
 export class HeroesService {
@@ -13,31 +14,34 @@ export class HeroesService {
   ) {}
 
   create(createHeroDto: CreateHeroDto) {
-    const entity = Hero.from(createHeroDto);
-    return this.heroRepository.save(entity);
+    const hero = this.heroRepository.create(createHeroDto);
+
+    if (createHeroDto.lastDamageAt) {
+      hero.lastDamageAt = new Date(createHeroDto.lastDamageAt);
+    }
+    return this.heroRepository.save(hero);
   }
 
-  findAll({ take = 10, skip = 0 }: { take?: number; skip?: number }) {
-    const limit = take > 100 ? 100 : (take ?? 10);
-    const offset = skip > 1000 ? 1000 : (skip ?? 0);
-    return this.heroRepository.findAndCount({ take: limit, skip: offset });
+  findAll({ take, skip }: { take?: number; skip?: number }) {
+    return this.heroRepository.findAndCount({ take: take, skip: skip });
   }
 
-  findOne(id: string) {
-    return this.heroRepository.findOneBy({ id });
+  async cfindOne(id: UUID) {
+    const hero = await this.heroRepository.findOneBy({ id });
+    if (!hero) throw new NotFoundException(`Hero with ID ${id} not found`);
+    return hero;
   }
 
   async update(id: string, updateHeroDto: UpdateHeroDto) {
     const entity = await this.heroRepository.findOneBy({ id });
-    if (entity) {
-      entity.merge(updateHeroDto);
-      return this.heroRepository.save(entity);
-    } else throw new NotFoundException();
+    if (!entity) throw new NotFoundException(`Hero with ID ${id} not found`);
+    const updateHero = this.heroRepository.merge(entity, updateHeroDto);
+    return this.heroRepository.save(updateHero);
   }
 
-  async remove(id: string) {
+  async remove(id: UUID) {
     const entity = await this.heroRepository.findOneBy({ id });
-    if (!entity) throw new NotFoundException();
+    if (!entity) throw new NotFoundException(`Hero with ID ${id} not found`);
     await this.heroRepository.delete(id);
   }
 }
