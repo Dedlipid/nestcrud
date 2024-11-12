@@ -10,8 +10,6 @@ import {
   Query,
   Logger,
   ParseUUIDPipe,
-  UsePipes,
-  ValidationPipe,
 } from '@nestjs/common';
 import { HeroesService } from './heroes.service';
 import { CreateHeroDto } from './dto/create-hero.dto';
@@ -26,7 +24,6 @@ export class HeroesController {
 
   @Post()
   @HttpCode(201)
-  @UsePipes(new ValidationPipe({ transform: true }))
   create(@Body() createHeroDto: CreateHeroDto) {
     try {
       return this.heroesService.create(createHeroDto);

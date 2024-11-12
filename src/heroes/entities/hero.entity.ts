@@ -43,8 +43,10 @@ export class Hero {
   })
   healthRestoreRate: number;
 
-  @Column()
-  lastDamageAt!: Date;
+  @Column({
+    nullable: true
+  })
+  lastDamageAt?: Date;
 
   @ManyToOne(() => League, (league) => league.heroes, {
     cascade: false,
