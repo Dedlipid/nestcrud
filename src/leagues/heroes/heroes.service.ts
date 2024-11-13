@@ -59,8 +59,9 @@ export class LeaguesHeroesService {
       await queryRunner.startTransaction();
       try {
         await queryRunner.manager.save(hero);
-        if (heroOldLeague)
+        if (heroOldLeague && heroOldLeague.isAnonymous) {
           await queryRunner.manager.delete(League, heroOldLeague.id);
+        }
 
         await queryRunner.commitTransaction();
       } catch (err) {
