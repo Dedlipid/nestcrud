@@ -1,4 +1,10 @@
-import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
+import {
+  Column,
+  CreateDateColumn,
+  Entity,
+  OneToMany,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
 import { Expose } from 'class-transformer';
 import { Hero } from '../../heroes/entities/hero.entity';
 import { UUID } from 'crypto';
@@ -20,8 +26,6 @@ export class League {
     return !this.name;
   }
 
-  @Column({
-    default: 'CURRENT_TIMESTAMP',
-  })
+  @CreateDateColumn()
   createdAt: Date;
 }
