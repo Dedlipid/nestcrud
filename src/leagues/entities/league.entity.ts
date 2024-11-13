@@ -21,7 +21,8 @@ export class League {
 
   @OneToMany(() => Hero, (hero) => hero.league, { cascade: false })
   heroes: Promise<Hero[]>;
-  @Expose() // todo check this
+
+  @Expose()
   get isAnonymous() {
     return !this.name;
   }

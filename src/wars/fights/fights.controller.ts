@@ -8,6 +8,8 @@ import {
   Delete,
   ParseUUIDPipe,
   Query,
+  ClassSerializerInterceptor,
+  UseInterceptors,
 } from '@nestjs/common';
 import { FightsService } from './fights.service';
 import { CreateFightDto } from './dto/create-fight.dto';
@@ -31,6 +33,7 @@ export class FightsController {
   }
 
   @Get(':id')
+  @UseInterceptors(ClassSerializerInterceptor)
   findOne(@Param('id', ParseUUIDPipe) id: UUID) {
     return this.fightsService.findOne(id);
   }

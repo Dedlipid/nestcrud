@@ -9,6 +9,8 @@ import {
   HttpCode,
   Query,
   ParseUUIDPipe,
+  ClassSerializerInterceptor,
+  UseInterceptors,
 } from '@nestjs/common';
 import { LeaguesService } from './leagues.service';
 import { CreateLeagueDto } from './dto/create-league.dto';
@@ -32,6 +34,7 @@ export class LeaguesController {
   }
 
   @Get(':id')
+  @UseInterceptors(ClassSerializerInterceptor)
   findOne(@Param('id', ParseUUIDPipe) id: UUID) {
     return this.leaguesService.findOne(id);
   }

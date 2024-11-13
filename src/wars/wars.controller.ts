@@ -11,6 +11,8 @@ import {
   ParseUUIDPipe,
   UsePipes,
   ValidationPipe,
+  ClassSerializerInterceptor,
+  UseInterceptors,
 } from '@nestjs/common';
 import { WarsService } from './wars.service';
 import { CreateWarDto } from './dto/create-war.dto';
@@ -36,6 +38,7 @@ export class WarsController {
   }
 
   @Get(':id')
+  @UseInterceptors(ClassSerializerInterceptor)
   findOne(@Param('id', ParseUUIDPipe) id: UUID) {
     return this.warsService.findOne(id);
   }
