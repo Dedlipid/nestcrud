@@ -22,10 +22,8 @@ export class LeaguesService {
     private leagueRepository: Repository<League>,
   ) {}
 
-  create(createLeagueDto: CreateLeagueDto) {
-    const entity = new League();
-    entity.name = createLeagueDto.name;
-    entity.createdAt = new Date();
+  async create(createLeagueDto: CreateLeagueDto) {
+    const entity = this.leagueRepository.create(createLeagueDto);
     return this.leagueRepository.save(entity);
   }
 

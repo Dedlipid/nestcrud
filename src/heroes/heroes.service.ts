@@ -19,7 +19,6 @@ export class HeroesService {
 
   create(createHeroDto: CreateHeroDto) {
     const hero = this.heroRepository.create(createHeroDto);
-    hero.createdAt = new Date();
     return this.heroRepository.save(hero);
   }
 
