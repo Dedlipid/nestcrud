@@ -1,4 +1,4 @@
-import {IsDefined, IsString, MaxLength} from "class-validator";
+import { IsDefined, IsString, MaxLength } from 'class-validator';
 
 export class CreateLeagueDto {
   @IsDefined()

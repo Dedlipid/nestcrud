@@ -15,7 +15,7 @@ import { HeroesService } from './heroes.service';
 import { CreateHeroDto } from './dto/create-hero.dto';
 import { UpdateHeroDto } from './dto/update-hero.dto';
 import { UUID } from 'crypto';
-import {PaginationDto} from "../helpers/pagination/pagination-dto";
+import { PaginationDto } from '../helpers/pagination/pagination-dto';
 @Controller('heroes')
 export class HeroesController {
   private readonly logger = new Logger(HeroesController.name);

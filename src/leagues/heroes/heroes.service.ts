@@ -4,31 +4,34 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
 import { League } from '../entities/league.entity';
-import { Repository } from 'typeorm';
+import { DataSource } from 'typeorm';
 import { HeroesService } from '../../heroes/heroes.service';
 import { Hero } from '../../heroes/entities/hero.entity';
+import { UUID } from 'crypto';
+import { LeaguesService } from '../leagues.service';
+import {he} from "@faker-js/faker";
 
 @Injectable()
 export class LeaguesHeroesService {
   constructor(
-    @InjectRepository(League)
-    private leagueRepository: Repository<League>,
+    private dataSource: DataSource,
+    private leaguesService: LeaguesService,
     private heroService: HeroesService,
   ) {}
 
   async createAnonymousLeague(hero: Hero) {
     const anonymousLeague = new League();
+    anonymousLeague.createdAt = new Date()
 
-    const queryRunner =
-      this.leagueRepository.manager.connection.createQueryRunner();
+    const queryRunner = this.dataSource.createQueryRunner();
 
     await queryRunner.connect();
     await queryRunner.startTransaction();
 
     try {
       await queryRunner.manager.save(anonymousLeague);
+      hero.league = anonymousLeague
       await queryRunner.manager.save(hero);
 
       await queryRunner.commitTransaction();
@@ -40,18 +43,18 @@ export class LeaguesHeroesService {
     }
   }
 
-  async insert(leagueId: string, heroId: string) {
-    const hero = await this.heroService.findOne(heroId);
-    const league = await this.leagueRepository.findOneBy({ id: leagueId });
+  async insert(leagueId: UUID, heroId: UUID) {
+    const hero = await this.heroService.findOne(heroId as UUID);
+    const league = await this.leaguesService.findOne(leagueId);
     if (hero && league) {
+      if (hero.league.id === league.id) return
       const heroOldLeague = hero.league;
       if (heroOldLeague && !heroOldLeague.isAnonymous) {
         throw new ConflictException();
       }
       hero.league = league;
 
-      const queryRunner =
-        this.leagueRepository.manager.connection.createQueryRunner();
+      const queryRunner = this.dataSource.createQueryRunner();
       await queryRunner.connect();
       await queryRunner.startTransaction();
       try {
@@ -69,9 +72,9 @@ export class LeaguesHeroesService {
     }
   }
 
-  async kick(leagueId: string, heroId: string) {
-    const hero = await this.heroService.findOne(heroId);
-    const league = await this.leagueRepository.findOneBy({ id: leagueId });
+  async kick(leagueId: UUID, heroId: UUID) {
+    const hero = await this.heroService.findOne(heroId as UUID);
+    const league = await this.leaguesService.findOne(leagueId);
     if (hero && league) {
       const heroCurrentLeague = hero.league;
       if (heroCurrentLeague.isAnonymous) {
