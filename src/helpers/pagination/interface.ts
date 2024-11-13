@@ -1,11 +1,11 @@
-export const DEFAULT_TAKE_VALUE = 10
+export const DEFAULT_TAKE_VALUE = 10;
 export interface Pageable {
-    createdAt: Date;
+  createdAt: Date;
 }
 
 export interface PaginationOptions {
-    limit?: number;
-    after?: string;
-    before?: string;
-    dec?: boolean;
+  limit?: number;
+  after?: string;
+  before?: string;
+  dec?: boolean;
 }
