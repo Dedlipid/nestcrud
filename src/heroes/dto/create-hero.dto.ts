@@ -4,7 +4,9 @@ import {
   IsNumber,
   IsOptional,
   IsPositive,
-  IsDateString, IsDefined, MaxLength,
+  IsDateString,
+  IsDefined,
+  MaxLength,
 } from 'class-validator';
 
 export class CreateHeroDto {

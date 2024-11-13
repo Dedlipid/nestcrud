@@ -1,11 +1,12 @@
 import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
 import { Expose } from 'class-transformer';
 import { Hero } from '../../heroes/entities/hero.entity';
+import { UUID } from 'crypto';
 
 @Entity()
 export class League {
   @PrimaryGeneratedColumn('uuid')
-  id: string;
+  id: UUID;
 
   @Column({
     nullable: true,
@@ -13,9 +14,14 @@ export class League {
   name?: string;
 
   @OneToMany(() => Hero, (hero) => hero.league, { cascade: false })
-  heroes: Hero[];
-  @Expose()
+  heroes: Promise<Hero[]>;
+  @Expose() // todo check this
   get isAnonymous() {
-    return !!this.name;
+    return !this.name;
   }
+
+  @Column({
+    default: 'CURRENT_TIMESTAMP',
+  })
+  createdAt: Date;
 }

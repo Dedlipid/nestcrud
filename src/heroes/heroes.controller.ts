@@ -10,14 +10,12 @@ import {
   Query,
   Logger,
   ParseUUIDPipe,
-  UsePipes,
-  ValidationPipe,
 } from '@nestjs/common';
 import { HeroesService } from './heroes.service';
 import { CreateHeroDto } from './dto/create-hero.dto';
 import { UpdateHeroDto } from './dto/update-hero.dto';
 import { UUID } from 'crypto';
-
+import { PaginationDto } from '../helpers/pagination/pagination-dto';
 @Controller('heroes')
 export class HeroesController {
   private readonly logger = new Logger(HeroesController.name);
@@ -26,7 +24,6 @@ export class HeroesController {
 
   @Post()
   @HttpCode(201)
-  @UsePipes(new ValidationPipe({ transform: true }))
   create(@Body() createHeroDto: CreateHeroDto) {
     try {
       return this.heroesService.create(createHeroDto);
@@ -37,12 +34,9 @@ export class HeroesController {
   }
 
   @Get()
-  findAll(@Query('limit') limit?: string, @Query('skip') skip?: string) {
+  findAll(@Query() query: PaginationDto) {
     try {
-      return this.heroesService.findAll({
-        skip: parseInt(skip) || 0,
-        take: Math.min(parseInt(limit) || 10, 100),
-      });
+      return this.heroesService.findAll(query);
     } catch (error) {
       this.logger.error('Error finding heroes', error.stack);
       throw error;

@@ -1,10 +1,11 @@
 import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
 import { League } from 'src/leagues/entities/league.entity';
+import { UUID } from 'crypto';
 
 @Entity()
 export class Hero {
   @PrimaryGeneratedColumn('uuid')
-  id: string;
+  id: UUID;
 
   @Column()
   name: string;
@@ -43,12 +44,20 @@ export class Hero {
   })
   healthRestoreRate: number;
 
-  @Column()
-  lastDamageAt!: Date;
+  @Column({
+    nullable: true,
+  })
+  lastDamageAt?: Date;
 
   @ManyToOne(() => League, (league) => league.heroes, {
     cascade: false,
     nullable: true,
+    eager: true,
   })
   league?: League;
+
+  @Column({
+    default: 'CURRENT_TIMESTAMP',
+  })
+  createdAt: Date;
 }
