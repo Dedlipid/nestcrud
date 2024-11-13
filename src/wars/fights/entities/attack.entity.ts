@@ -1,11 +1,12 @@
 import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
 import { Fight } from './fight.entity';
 import { Participant } from '../../entities/participant.entity';
+import { UUID } from 'crypto';
 
 @Entity()
 export class Attack {
   @PrimaryGeneratedColumn('uuid')
-  id: string;
+  id: UUID;
 
   @Column()
   impactAt: Date;
