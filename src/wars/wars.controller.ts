@@ -16,6 +16,8 @@ import { WarsService } from './wars.service';
 import { CreateWarDto } from './dto/create-war.dto';
 import { UpdateWarDto } from './dto/update-war.dto';
 import { UUID } from 'crypto';
+import { PaginationDto } from 'src/helpers/pagination/pagination-dto';
+import { PaginationOptions } from 'src/helpers/pagination/interface';
 
 @Controller('wars')
 export class WarsController {
@@ -29,11 +31,8 @@ export class WarsController {
   }
 
   @Get()
-  findAll(@Query('limit') take?: string, @Query('skip') skip?: string) {
-    return this.warsService.findAll({
-      skip: parseInt(skip) || 0,
-      take: Math.min(parseInt(take) || 10, 100),
-    });
+  findAll(@Query() options: PaginationDto) {
+    return this.warsService.findAll(options);
   }
 
   @Get(':id')
