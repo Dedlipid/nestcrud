@@ -41,6 +41,11 @@ export class War {
   })
   burnt?: League;
 
+  @Column({
+    default: 'CURRENT_TIMESTAMP',
+  })
+  createdAt: Date;
+
   @Expose()
   get withdraw() {
     return !!this.endAt && !this.burnt && !this.winner;
