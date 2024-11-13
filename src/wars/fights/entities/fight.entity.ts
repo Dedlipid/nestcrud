@@ -9,11 +9,12 @@ import {
 import { Participant } from '../../entities/participant.entity';
 import { Attack } from './attack.entity';
 import { Expose } from 'class-transformer';
+import { UUID } from 'crypto';
 
 @Entity()
 export class Fight {
   @PrimaryGeneratedColumn('uuid')
-  id: string;
+  id: UUID;
 
   @Column()
   startAt: Date;
