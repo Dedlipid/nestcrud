@@ -9,25 +9,22 @@ import {
   HttpCode,
   Query,
   ParseUUIDPipe,
-  UsePipes,
-  ValidationPipe,
   ClassSerializerInterceptor,
   UseInterceptors,
+  HttpStatus,
 } from '@nestjs/common';
 import { WarsService } from './wars.service';
 import { CreateWarDto } from './dto/create-war.dto';
 import { UpdateWarDto } from './dto/update-war.dto';
 import { UUID } from 'crypto';
 import { PaginationDto } from 'src/helpers/pagination/pagination-dto';
-import { PaginationOptions } from 'src/helpers/pagination/interface';
 
 @Controller('wars')
 export class WarsController {
   constructor(private readonly warsService: WarsService) {}
 
   @Post()
-  @UsePipes(new ValidationPipe({ transform: true }))
-  @HttpCode(201)
+  @HttpCode(HttpStatus.CREATED)
   create(@Body() createWarDto: CreateWarDto) {
     return this.warsService.create(createWarDto);
   }
@@ -52,7 +49,7 @@ export class WarsController {
   }
 
   @Delete(':id')
-  @HttpCode(204)
+  @HttpCode(HttpStatus.NO_CONTENT)
   remove(@Param('id', ParseUUIDPipe) id: UUID) {
     return this.warsService.remove(id);
   }
