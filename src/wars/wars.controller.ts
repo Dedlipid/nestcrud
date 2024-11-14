@@ -18,6 +18,7 @@ import { CreateWarDto } from './dto/create-war.dto';
 import { UpdateWarDto } from './dto/update-war.dto';
 import { UUID } from 'crypto';
 import { PaginationDto } from 'src/helpers/pagination/pagination-dto';
+import { th } from '@faker-js/faker/.';
 
 @Controller('wars')
 export class WarsController {
@@ -31,6 +32,15 @@ export class WarsController {
 
   @Get()
   findAll(@Query() options: PaginationDto) {
+    if (options.limit && options.limit < 0)
+      throw new Error('Limit must be greater than 0');
+
+    if (options.before && new Date(options.before) > new Date())
+      throw new Error('Date must be before today');
+
+    if (options.after && new Date(options.after) > new Date())
+      throw new Error('Date must be before today');
+
     return this.warsService.findAll(options);
   }
 

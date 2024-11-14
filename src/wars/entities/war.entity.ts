@@ -19,6 +19,19 @@ export class War {
   @Column()
   name: string;
 
+  /*{ //if implicit conversion is a problem put this in the column decorator
+    type: 'timestamp',
+    transformer: {
+      to: (value: string | Date): Date => {
+        // Convert a date string to a Date object if it's not already a Date
+        return typeof value === 'string' ? new Date(value) : value;
+      },
+      from: (value: Date): Date => {
+        // Return the Date object as is when retrieving from the database
+        return value;
+      },
+    },
+  }*/
   @Column()
   startAt: Date;
 

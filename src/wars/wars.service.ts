@@ -19,14 +19,17 @@ export class WarsService {
     private warRepository: Repository<War>,
   ) {}
 
-  async create(createWarDto: CreateWarDto) {
-    const war = await this.warRepository.create(createWarDto);
-    return await this.warRepository.save(war);
+  create(createWarDto: CreateWarDto) {
+    const war = this.warRepository.create(createWarDto);
+    return this.warRepository.save(war);
   }
 
   async update(id: UUID, updateWarDto: UpdateWarDto) {
     const entity = await this.warRepository.findOneBy({ id });
     if (!entity) throw new NotFoundException(`War with ID ${id} not found`);
+    if (entity.startAt && !entity.endAt) {
+      throw new Error('Cannot update ongoing war');
+    }
     this.warRepository.merge(entity, updateWarDto);
     return await this.warRepository.save(entity);
   }
@@ -54,7 +57,6 @@ export class WarsService {
     const query = this.warRepository.createQueryBuilder('war');
 
     const limit = options.limit ?? DEFAULT_TAKE_VALUE;
-    if (limit <= 0) throw new Error('Limit cannot be less than 0');
     const before = options.before ?? new Date().toISOString();
 
     const queryMaps = {
@@ -88,13 +90,16 @@ export class WarsService {
   async remove(id: UUID) {
     const entity = await this.warRepository.findOneBy({ id });
     if (!entity) throw new NotFoundException(`War with ID ${id} not found`);
+    if (entity.startAt && !entity.endAt) {
+      throw new Error('Cannot delete ongoing war');
+    }
     await this.warRepository.delete(id);
   }
-  // async findAllInWar(warId: UUID, leagueId?: UUID) {
-  //   const participants = await this.participantRepository.find({
-  //     where: { warId },
-  //   });
-  //   if (leagueId) return participants.filter((p) => p.league.id === leagueId);
-  //   return participants;
-  // }
+  /*async findAllInWar(warId: UUID, leagueId?: UUID) {
+    const participants = await this.participantRepository.find({
+      where: { warId },
+    });
+    if (leagueId) return participants.filter((p) => p.league.id === leagueId);
+    return participants;
+  }*/
 }
