@@ -1,5 +1,6 @@
 import {
   Column,
+  CreateDateColumn,
   Entity,
   JoinTable,
   ManyToMany,
@@ -15,6 +16,9 @@ import { UUID } from 'crypto';
 export class Fight {
   @PrimaryGeneratedColumn('uuid')
   id: UUID;
+
+  @CreateDateColumn()
+  createdAt: Date;
 
   @Column()
   startAt: Date;

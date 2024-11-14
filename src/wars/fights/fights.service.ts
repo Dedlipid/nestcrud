@@ -29,20 +29,19 @@ export class FightsService {
       before = new Date(),
       dec = false,
     } = options;
-    const forceLimit = Math.min(limit, 10);
 
     const query = this.fightRepository.createQueryBuilder('fight');
 
     if (after) {
-      query.andWhere('fight.startAt > :after', { after: new Date(after) });
+      query.andWhere('fight.createdAt > :after', { after: new Date(after) });
     }
 
     if (before) {
-      query.andWhere('fight.startAt < :before', { before: new Date(before) });
+      query.andWhere('fight.createdAt < :before', { before: new Date(before) });
     }
 
-    query.orderBy('fight.startAt', dec ? 'DESC' : 'ASC');
-    query.take(forceLimit);
+    query.orderBy('fight.createdAt', dec ? 'DESC' : 'ASC');
+    query.take(limit);
 
     return query.getMany();
   }
@@ -56,13 +55,22 @@ export class FightsService {
   async update(id: UUID, updateFightDto: UpdateFightDto) {
     const entity = await this.fightRepository.findOneBy({ id });
     if (!entity) throw new NotFoundException(`Fight with ID ${id} not found`);
+    if (entity.startAt) {
+      throw new Error('Cannot update ongoing fight');
+    }
+    if (entity.endAt) {
+      throw new Error('Cannot update ended fight');
+    }
     const updateFight = this.fightRepository.merge(entity, updateFightDto);
     return this.fightRepository.save(updateFight);
   }
 
   async remove(id: UUID) {
-    const entity = this.fightRepository.findOneBy({ id });
+    const entity = await this.fightRepository.findOneBy({ id });
     if (!entity) throw new NotFoundException(`Fight with ID ${id} not found`);
+    if (entity.startAt && !entity.endAt) {
+      throw new Error('Cannot delete ongoing fight');
+    }
     await this.fightRepository.delete(id);
   }
 }
