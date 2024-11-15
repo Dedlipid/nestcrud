@@ -1,20 +1,21 @@
 import {
   Controller,
   Delete,
-  Get,
+  HttpCode,
+  HttpStatus,
   Param,
   ParseUUIDPipe,
   Post,
-  Query,
 } from '@nestjs/common';
-import { ParticipantService } from './participant.service';
 import { UUID } from 'crypto';
+import { ParticipantService } from './participant.service';
 
 @Controller('wars/:warId/participant')
 export class ParticipantController {
   constructor(protected readonly participantService: ParticipantService) {}
 
   @Post('/:heroId')
+  @HttpCode(HttpStatus.CREATED)
   create(
     @Param('warId', ParseUUIDPipe) warId: UUID,
     @Param('heroId') heroId: UUID,
@@ -23,6 +24,7 @@ export class ParticipantController {
   }
 
   @Delete('/:heroId')
+  @HttpCode(HttpStatus.NO_CONTENT)
   remove(
     @Param('warID', ParseUUIDPipe) warId: UUID,
     @Param('heroId') heroId: UUID,
