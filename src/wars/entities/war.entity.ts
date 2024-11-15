@@ -47,16 +47,14 @@ export class War {
   @ManyToOne(() => League, {
     cascade: false,
     nullable: true,
-    lazy: true,
   })
-  winner?: Promise<League>;
+  winner?: League;
 
   @ManyToOne(() => League, {
     cascade: false,
     nullable: true,
-    lazy: true,
   })
-  burnt?: Promise<League>;
+  burnt?: League;
 
   @CreateDateColumn()
   createdAt: Date;
