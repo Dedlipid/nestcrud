@@ -12,6 +12,7 @@ import {
   UseInterceptors,
   HttpCode,
   HttpStatus,
+  BadRequestException,
 } from '@nestjs/common';
 import { FightsService } from './fights.service';
 import { CreateFightDto } from './dto/create-fight.dto';
@@ -31,12 +32,10 @@ export class FightsController {
 
   @Get()
   findAll(@Query() options: PaginationDto) {
-    if (options.limit && options.limit < 0)
-      throw new Error('Limit must be greater than 0');
     if (options.before && new Date(options.before) > new Date())
-      throw new Error('Date must be before today');
+      throw new BadRequestException('Date must be before today');
     if (options.after && new Date(options.after) > new Date())
-      throw new Error('Date must be before today');
+      throw new BadRequestException('Date must be before today');
     return this.fightsService.findAll(options);
   }
 

@@ -30,16 +30,19 @@ export class Fight {
   @JoinTable()
   participants: Participant[];
 
-  @OneToMany(() => Attack, (attack) => attack.fight, { cascade: true })
-  attacks: Attack[];
+  @OneToMany(() => Attack, (attack) => attack.fight, 
+  { cascade: true, 
+    lazy: true,
+  })
+  attacks: Promise<Attack[]>;
 
-  @ManyToMany(() => Participant)
+  @ManyToMany(() => Participant, { lazy: true })
   @JoinTable()
-  winner?: Participant[];
+  winner?: Promise<Participant[]>;
 
-  @ManyToMany(() => Participant)
+  @ManyToMany(() => Participant, { lazy: true })
   @JoinTable()
-  burnt?: Participant[];
+  burnt?: Promise<Participant[]>;
 
   @Expose()
   get withdraw() {
