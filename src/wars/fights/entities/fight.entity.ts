@@ -26,9 +26,9 @@ export class Fight {
   @Column()
   endAt?: Date;
 
-  @ManyToMany(() => Participant)
+  @ManyToMany(() => Participant, { lazy: true })
   @JoinTable()
-  participants: Participant[];
+  participants: Promise<Participant[]>;
 
   @OneToMany(() => Attack, (attack) => attack.fight, 
   { cascade: true, 
