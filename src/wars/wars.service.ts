@@ -29,10 +29,10 @@ export class WarsService {
     if (!entity) throw new NotFoundException(`War with ID ${id} not found`);
     
     if (entity.endAt)
-      throw new MethodNotAllowedException('Cannot delete ended war');
+      throw new MethodNotAllowedException('Cannot update ended war');
     
     if (entity.startAt < new Date())
-      throw new BadRequestException('Cannot delete ongoing war');
+      throw new BadRequestException('Cannot update ongoing war');
     
     this.warRepository.merge(entity, updateWarDto);
     return await this.warRepository.save(entity);
