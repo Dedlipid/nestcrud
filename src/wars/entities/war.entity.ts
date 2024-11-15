@@ -40,20 +40,23 @@ export class War {
 
   @OneToMany(() => Participant, (participant) => participant.war, {
     cascade: true,
+    lazy: true,
   })
-  participants: Participant[];
+  participants: Promise<Participant[]>;
 
   @ManyToOne(() => League, {
     cascade: false,
     nullable: true,
+    lazy: true,
   })
-  winner?: League;
+  winner?: Promise<League>;
 
   @ManyToOne(() => League, {
     cascade: false,
     nullable: true,
+    lazy: true,
   })
-  burnt?: League;
+  burnt?: Promise<League>;
 
   @CreateDateColumn()
   createdAt: Date;

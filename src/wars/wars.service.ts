@@ -1,4 +1,4 @@
-import { Injectable, Logger, NotFoundException } from '@nestjs/common';
+import { BadRequestException, ConflictException, Injectable, Logger, MethodNotAllowedException, NotFoundException } from '@nestjs/common';
 import { CreateWarDto } from './dto/create-war.dto';
 import { UpdateWarDto } from './dto/update-war.dto';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -17,7 +17,7 @@ export class WarsService {
   constructor(
     @InjectRepository(War)
     private warRepository: Repository<War>,
-  ) {}
+  ) { }
 
   create(createWarDto: CreateWarDto) {
     const war = this.warRepository.create(createWarDto);
@@ -27,9 +27,13 @@ export class WarsService {
   async update(id: UUID, updateWarDto: UpdateWarDto) {
     const entity = await this.warRepository.findOneBy({ id });
     if (!entity) throw new NotFoundException(`War with ID ${id} not found`);
-    if (entity.startAt && !entity.endAt) {
-      throw new Error('Cannot update ongoing war');
-    }
+    
+    if (entity.endAt)
+      throw new MethodNotAllowedException('Cannot delete ended war');
+    
+    if (entity.startAt < new Date())
+      throw new BadRequestException('Cannot delete ongoing war');
+    
     this.warRepository.merge(entity, updateWarDto);
     return await this.warRepository.save(entity);
   }
@@ -45,14 +49,14 @@ export class WarsService {
       const query = this.warRepository.createQueryBuilder('war');
 
       if (after) {
-        query.andWhere('war.startAt > :after', { after: new Date(after) });
+        query.andWhere('war."startAt" > :after', { after: new Date(after) });
       }
 
       if (before) {
-        query.andWhere('war.startAt < :before', { before: new Date(before) });
+        query.andWhere('war."startAt" < :before', { before: new Date(before) });
       }
 
-      query.orderBy('war.startAt', dec ? 'DESC' : 'ASC');
+      query.orderBy('war."startAt"', dec ? 'DESC' : 'ASC');
       query.take(limit);*/
     const query = this.warRepository.createQueryBuilder('war');
 
@@ -61,11 +65,11 @@ export class WarsService {
 
     const queryMaps = {
       after: (value: string) =>
-        query.andWhere('war.startAt > :after', { after: new Date(value) }),
+        query.andWhere('war."startAt" > :after', { after: new Date(value) }),
       before: (value: string) =>
-        query.andWhere('war.startAt < :before', { before: new Date(value) }),
+        query.andWhere('war."startAt" < :before', { before: new Date(value) }),
       dec: (value: boolean) =>
-        query.orderBy('war.startAt', value ? 'DESC' : 'ASC'),
+        query.orderBy('war."startAt"', value ? 'DESC' : 'ASC'),
       limit: (value: number) => query.take(value),
     };
 
@@ -76,7 +80,7 @@ export class WarsService {
       if (queryMaps[key]) queryMaps[key](value);
     }
 
-    if (!options.dec) query.orderBy('war.startAt', 'ASC');
+    if (!options.dec) query.orderBy('war."startAt"', 'ASC');
 
     return query.getMany();
   }
@@ -90,9 +94,13 @@ export class WarsService {
   async remove(id: UUID) {
     const entity = await this.warRepository.findOneBy({ id });
     if (!entity) throw new NotFoundException(`War with ID ${id} not found`);
-    if (entity.startAt && !entity.endAt) {
-      throw new Error('Cannot delete ongoing war');
-    }
+    
+    if (entity.endAt)
+      throw new MethodNotAllowedException('Cannot delete ended war');
+
+    if (entity.startAt < new Date())
+      throw new BadRequestException('Cannot delete ongoing war');//should it just method not allowed?
+
     await this.warRepository.delete(id);
   }
   /*async findAllInWar(warId: UUID, leagueId?: UUID) {
