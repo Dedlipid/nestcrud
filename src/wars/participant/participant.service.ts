@@ -58,8 +58,15 @@ export class ParticipantService {
     return this.participantRepository.save(participant);
   }
 
-  async findOne(id: UUID) {
-    const participant = await this.participantRepository.findOneBy({ id });
+  findAll(warId: UUID) {
+    return this.participantRepository.findBy({ warId });
+  }
+
+  async findOne(warID: UUID, heroId: UUID) {
+    const participant = await this.participantRepository.findOneBy({
+      heroId: heroId,
+      warId: warID,
+    });
     if (!participant) {
       throw new NotFoundException('Participant not found');
     }
