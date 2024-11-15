@@ -1,21 +1,20 @@
 import {
   BadRequestException,
-  ConflictException,
   Injectable,
   Logger,
   MethodNotAllowedException,
   NotFoundException,
 } from '@nestjs/common';
-import { CreateWarDto } from './dto/create-war.dto';
-import { UpdateWarDto } from './dto/update-war.dto';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
-import { War } from './entities/war.entity';
 import { UUID } from 'crypto';
 import {
   DEFAULT_TAKE_VALUE,
   PaginationOptions,
 } from 'src/helpers/pagination/interface';
+import { Repository } from 'typeorm';
+import { CreateWarDto } from './dto/create-war.dto';
+import { UpdateWarDto } from './dto/update-war.dto';
+import { War } from './entities/war.entity';
 
 @Injectable()
 export class WarsService {
@@ -26,45 +25,40 @@ export class WarsService {
     private warRepository: Repository<War>,
   ) {}
 
-  create(createWarDto: CreateWarDto) {
+  async create(createWarDto: CreateWarDto) {
+    this.logger.log('Creating a new war');
     const war = this.warRepository.create(createWarDto);
-    return this.warRepository.save(war);
+    const savedWar = await this.warRepository.save(war);
+    this.logger.log(`War created with ID: ${savedWar.id}`);
+    return savedWar;
   }
 
   async update(id: UUID, updateWarDto: UpdateWarDto) {
+    this.logger.log(`Updating war with ID: ${id}`);
     const entity = await this.warRepository.findOneBy({ id });
-    if (!entity) throw new NotFoundException(`War with ID ${id} not found`);
+    if (!entity) {
+      this.logger.warn(`War with ID ${id} not found`);
+      throw new NotFoundException(`War with ID ${id} not found`);
+    }
 
-    if (entity.endAt)
+    if (entity.endAt) {
+      this.logger.warn(`Cannot update ended war with ID: ${id}`);
       throw new MethodNotAllowedException('Cannot update ended war');
+    }
 
-    if (entity.startAt < new Date())
+    if (entity.startAt < new Date()) {
+      this.logger.warn(`Cannot update ongoing war with ID: ${id}`);
       throw new BadRequestException('Cannot update ongoing war');
+    }
 
     this.warRepository.merge(entity, updateWarDto);
-    return await this.warRepository.save(entity);
+    const updatedWar = await this.warRepository.save(entity);
+    this.logger.log(`War with ID: ${id} updated successfully`);
+    return updatedWar;
   }
 
-  findAll(options: PaginationOptions): Promise<War[]> {
-    /* const {
-        limit = DEFAULT_TAKE_VALUE,
-        after,
-        before = new Date(),
-        dec = false,
-      } = options;
-
-      const query = this.warRepository.createQueryBuilder('war');
-
-      if (after) {
-        query.andWhere('war."startAt" > :after', { after: new Date(after) });
-      }
-
-      if (before) {
-        query.andWhere('war."startAt" < :before', { before: new Date(before) });
-      }
-
-      query.orderBy('war."startAt"', dec ? 'DESC' : 'ASC');
-      query.take(limit);*/
+  async findAll(options: PaginationOptions): Promise<War[]> {
+    this.logger.log('Fetching all wars with pagination options');
     const query = this.warRepository.createQueryBuilder('war');
 
     const limit = options.limit ?? DEFAULT_TAKE_VALUE;
@@ -89,32 +83,41 @@ export class WarsService {
 
     if (!options.dec) query.orderBy('war."startAt"', 'ASC');
 
-    return query.getMany();
+    const wars = await query.getMany();
+    this.logger.log(`Fetched ${wars.length} wars`);
+    return wars;
   }
 
-  findOne(id: UUID) {
-    const hero = this.warRepository.findOneBy({ id });
-    if (!hero) throw new NotFoundException(`War with ID ${id} not found`);
+  async findOne(id: UUID) {
+    this.logger.log(`Fetching war with ID: ${id}`);
+    const hero = await this.warRepository.findOneBy({ id });
+    if (!hero) {
+      this.logger.warn(`War with ID ${id} not found`);
+      throw new NotFoundException(`War with ID ${id} not found`);
+    }
+    this.logger.log(`War with ID: ${id} fetched successfully`);
     return hero;
   }
 
   async remove(id: UUID) {
+    this.logger.log(`Removing war with ID: ${id}`);
     const entity = await this.warRepository.findOneBy({ id });
-    if (!entity) throw new NotFoundException(`War with ID ${id} not found`);
+    if (!entity) {
+      this.logger.warn(`War with ID ${id} not found`);
+      throw new NotFoundException(`War with ID ${id} not found`);
+    }
 
-    if (entity.endAt)
+    if (entity.endAt) {
+      this.logger.warn(`Cannot delete ended war with ID: ${id}`);
       throw new MethodNotAllowedException('Cannot delete ended war');
+    }
 
-    if (entity.startAt < new Date())
-      throw new BadRequestException('Cannot delete ongoing war'); //should it just method not allowed?
+    if (entity.startAt < new Date()) {
+      this.logger.warn(`Cannot delete ongoing war with ID: ${id}`);
+      throw new BadRequestException('Cannot delete ongoing war');
+    }
 
     await this.warRepository.delete(id);
+    this.logger.log(`War with ID: ${id} removed successfully`);
   }
-  /*async findAllInWar(warId: UUID, leagueId?: UUID) {
-    const participants = await this.participantRepository.find({
-      where: { warId },
-    });
-    if (leagueId) return participants.filter((p) => p.league.id === leagueId);
-    return participants;
-  }*/
 }
