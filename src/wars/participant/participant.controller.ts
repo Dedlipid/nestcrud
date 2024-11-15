@@ -29,4 +29,6 @@ export class ParticipantController {
   ) {
     return this.participantService.remove(warId, heroId);
   }
+  //TODO: add GET /wars/:warId/participant/:heroId
+  //TODO: add GET /wars/:warId/participant
 }

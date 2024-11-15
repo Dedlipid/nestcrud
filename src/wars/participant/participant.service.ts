@@ -1,4 +1,5 @@
 import {
+  ConflictException,
   Injectable,
   NotFoundException,
   UnprocessableEntityException,
@@ -9,6 +10,8 @@ import { WarsService } from '../wars.service';
 import { UUID } from 'crypto';
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
+
+//const LEAGUE_LIMIT = 2;
 
 @Injectable()
 export class ParticipantService {
@@ -21,11 +24,26 @@ export class ParticipantService {
 
   async create(warId: UUID, heroId: UUID) {
     const hero = await this.heroesService.findOne(heroId);
-    if (!hero) throw new NotFoundException('Hero not found');
+    if (!hero) 
+      throw new NotFoundException('Hero not found');
     if (!hero.league)
       throw new UnprocessableEntityException('Hero must be in a league');
+    
     const war = await this.warsService.findOne(warId);
-    if (!war) throw new NotFoundException('War not found');
+    if (!war) 
+      throw new NotFoundException('War not found');
+    if (war.endAt)
+      throw new UnprocessableEntityException('Cannot add participant to ended war');
+    if (war.startAt < new Date())
+      throw new UnprocessableEntityException('Cannot add participant to ongoing war');
+    //TODO: check if legue is even in the war?
+    
+    const checkParticipant = await this.participantRepository.findOneBy({
+      heroId,
+      warId,
+    });
+    if (checkParticipant)
+      throw new ConflictException('Participant already exists');
 
     const participant = this.participantRepository.create({
       war,
@@ -48,8 +66,15 @@ export class ParticipantService {
 
   async remove(warId: UUID, heroId: UUID) {
     const war = await this.warsService.findOne(warId);
-    if (!war) throw new NotFoundException('War not found');
-    if (war.withdraw) throw new UnprocessableEntityException('War is ongoing');
+    if (!war) 
+      throw new NotFoundException('War not found');
+    if (war.startAt < new Date())
+      throw new UnprocessableEntityException('Cannot remove participant from ongoing war');
+    
+    const hero = await this.heroesService.findOne(heroId);
+    if (!hero) 
+      throw new NotFoundException('Hero not found');
+
     const participant = await this.participantRepository.findOneBy({
       heroId,
       warId,
