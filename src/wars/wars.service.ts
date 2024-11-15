@@ -1,4 +1,11 @@
-import { BadRequestException, ConflictException, Injectable, Logger, MethodNotAllowedException, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  ConflictException,
+  Injectable,
+  Logger,
+  MethodNotAllowedException,
+  NotFoundException,
+} from '@nestjs/common';
 import { CreateWarDto } from './dto/create-war.dto';
 import { UpdateWarDto } from './dto/update-war.dto';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -17,7 +24,7 @@ export class WarsService {
   constructor(
     @InjectRepository(War)
     private warRepository: Repository<War>,
-  ) { }
+  ) {}
 
   create(createWarDto: CreateWarDto) {
     const war = this.warRepository.create(createWarDto);
@@ -27,13 +34,13 @@ export class WarsService {
   async update(id: UUID, updateWarDto: UpdateWarDto) {
     const entity = await this.warRepository.findOneBy({ id });
     if (!entity) throw new NotFoundException(`War with ID ${id} not found`);
-    
+
     if (entity.endAt)
       throw new MethodNotAllowedException('Cannot update ended war');
-    
+
     if (entity.startAt < new Date())
       throw new BadRequestException('Cannot update ongoing war');
-    
+
     this.warRepository.merge(entity, updateWarDto);
     return await this.warRepository.save(entity);
   }
@@ -94,12 +101,12 @@ export class WarsService {
   async remove(id: UUID) {
     const entity = await this.warRepository.findOneBy({ id });
     if (!entity) throw new NotFoundException(`War with ID ${id} not found`);
-    
+
     if (entity.endAt)
       throw new MethodNotAllowedException('Cannot delete ended war');
 
     if (entity.startAt < new Date())
-      throw new BadRequestException('Cannot delete ongoing war');//should it just method not allowed?
+      throw new BadRequestException('Cannot delete ongoing war'); //should it just method not allowed?
 
     await this.warRepository.delete(id);
   }

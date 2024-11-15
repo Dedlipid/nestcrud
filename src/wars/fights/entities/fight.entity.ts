@@ -30,8 +30,8 @@ export class Fight {
   @JoinTable()
   participants: Promise<Participant[]>;
 
-  @OneToMany(() => Attack, (attack) => attack.fight, 
-  { cascade: true, 
+  @OneToMany(() => Attack, (attack) => attack.fight, {
+    cascade: true,
     lazy: true,
   })
   attacks: Promise<Attack[]>;

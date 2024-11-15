@@ -10,7 +10,7 @@ import { HeroesService } from '../../heroes/heroes.service';
 import { Hero } from '../../heroes/entities/hero.entity';
 import { UUID } from 'crypto';
 import { LeaguesService } from '../leagues.service';
-import {he} from "@faker-js/faker";
+import { he } from '@faker-js/faker';
 
 @Injectable()
 export class LeaguesHeroesService {
@@ -22,7 +22,7 @@ export class LeaguesHeroesService {
 
   async createAnonymousLeague(hero: Hero) {
     const anonymousLeague = new League();
-    anonymousLeague.createdAt = new Date()
+    anonymousLeague.createdAt = new Date();
 
     const queryRunner = this.dataSource.createQueryRunner();
 
@@ -31,7 +31,7 @@ export class LeaguesHeroesService {
 
     try {
       await queryRunner.manager.save(anonymousLeague);
-      hero.league = anonymousLeague
+      hero.league = anonymousLeague;
       await queryRunner.manager.save(hero);
 
       await queryRunner.commitTransaction();
@@ -47,7 +47,7 @@ export class LeaguesHeroesService {
     const hero = await this.heroService.findOne(heroId as UUID);
     const league = await this.leaguesService.findOne(leagueId);
     if (hero && league) {
-      if (hero.league.id === league.id) return
+      if (hero.league.id === league.id) return;
       const heroOldLeague = hero.league;
       if (heroOldLeague && !heroOldLeague.isAnonymous) {
         throw new ConflictException();

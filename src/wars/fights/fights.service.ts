@@ -1,4 +1,9 @@
-import { Injectable, MethodNotAllowedException, NotFoundException, UnprocessableEntityException } from '@nestjs/common';
+import {
+  Injectable,
+  MethodNotAllowedException,
+  NotFoundException,
+  UnprocessableEntityException,
+} from '@nestjs/common';
 import { CreateFightDto } from './dto/create-fight.dto';
 import { UpdateFightDto } from './dto/update-fight.dto';
 import { UUID } from 'crypto';
@@ -55,12 +60,12 @@ export class FightsService {
   async update(id: UUID, updateFightDto: UpdateFightDto) {
     const entity = await this.fightRepository.findOneBy({ id });
     if (!entity) throw new NotFoundException(`Fight with ID ${id} not found`);
-    if (entity.endAt) 
+    if (entity.endAt)
       throw new MethodNotAllowedException('Cannot update ended fight');
-    
-    if (entity.startAt < new Date()) 
+
+    if (entity.startAt < new Date())
       throw new UnprocessableEntityException('Cannot update ongoing fight');
-    
+
     const updateFight = this.fightRepository.merge(entity, updateFightDto);
     return this.fightRepository.save(updateFight);
   }
@@ -68,7 +73,7 @@ export class FightsService {
   async remove(id: UUID) {
     const entity = await this.fightRepository.findOneBy({ id });
     if (!entity) throw new NotFoundException(`Fight with ID ${id} not found`);
-    if (entity.endAt) 
+    if (entity.endAt)
       throw new MethodNotAllowedException('Cannot remove ended fight');
     if (entity.startAt < new Date())
       throw new UnprocessableEntityException('Cannot remove ongoing fight');
