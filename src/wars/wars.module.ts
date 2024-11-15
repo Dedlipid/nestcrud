@@ -8,10 +8,11 @@ import { War } from './entities/war.entity';
 import { ParticipantController } from './participant/participant.controller';
 import { ParticipantService } from './participant/participant.service';
 import { HeroesModule } from 'src/heroes/heroes.module';
+import { WarRepository } from './wars.repository';
 
 @Module({
   controllers: [WarsController, ParticipantController],
-  providers: [WarsService, ParticipantService],
+  providers: [WarsService, WarRepository, ParticipantService],
   imports: [
     FightsModule,
     TypeOrmModule.forFeature([War, Participant]),
